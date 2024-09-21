@@ -1,3 +1,4 @@
+# version 1.0
 # indonesia
 ![xss py - dev  Codespaces_ ominous space potato  - Visual Studio Code - Google Chrome 21_09_2024 11_26_38 (2)](https://github.com/user-attachments/assets/0fc458ed-e268-4ef5-9954-cead87f323b1)
 
