@@ -1,2 +1,2 @@
-"masukan list target"
-https://target.com/
+https://target1.io/
+https://target2.com/
