@@ -9,7 +9,7 @@ XSS adalah eksploitasi keamanan di mana penyerang menempatkan malicious client-e
 4. python xss-zero.py
 5. Ikuti instruksi di menu untuk melakukan pemindaian atau keluar.
 
-#England
+# England
 # xss-scanner-zero
 XSS is a security exploit where an attacker places malicious client-end code into a web page. These attacks have become quite common in recent years, and most of them target large websites.
 
