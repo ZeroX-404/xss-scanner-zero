@@ -1,0 +1,2 @@
+"masukan list target"
+https://target.com/
