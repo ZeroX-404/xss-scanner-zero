@@ -7,7 +7,7 @@ XSS adalah eksploitasi keamanan di mana penyerang menempatkan malicious client-e
 2. cd xss-scanner-zero
 3. pip install sys,requests,pprint,BeautifulSoup,urljoin,colorama
 4. python xss-zero.py
-5.Ikuti instruksi di menu untuk melakukan pemindaian atau keluar.
+5. Ikuti instruksi di menu untuk melakukan pemindaian atau keluar.
 
 #England
 # xss-scanner-zero
