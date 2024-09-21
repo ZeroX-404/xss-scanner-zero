@@ -17,5 +17,5 @@ XSS is a security exploit where an attacker places malicious client-end code int
 1. git clone https://github.com/ZeroX-404/xss-scanner-zero
 2. cd xss-scanner-zero
 3. pip install sys,requests,pprint,BeautifulSoup,urljoin,colorama
-4. python xss_zero.py
+4. python xss-zero.py
 5. Follow the instructions in the menu to perform the scan or exit.
