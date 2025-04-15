@@ -20,3 +20,5 @@ XSS is a security exploit where an attacker places malicious client-end code int
 3. pip install sys,requests,pprint,BeautifulSoup,urljoin,colorama
 4. python xss-zero.py
 5. Follow the instructions in the menu to perform the scan or exit.
+
+![Profile views](https://komarev.com/ghpvc/?username=ZeroX-404&color=blueviolet&style=flat)
